@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -71,6 +72,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.serviceResult.collect {
+                    viewModel.getContacts()
                     when (it) {
                         DeleteDuplicatesResult.Success ->
                             Toast.makeText(
@@ -131,85 +133,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun ContactsScreen(viewModel: MainViewModel) {
 
-    val contacts = viewModel.contacts.collectAsState()
-    val buttonState = viewModel.buttonState.collectAsState()
-
-    Column {
-        LazyColumn(
-            modifier = Modifier
-                .weight(9f)
-        ) {
-            items(contacts.value) { contact ->
-                ContactCard(contact)
-            }
-        }
-        Button(
-            onClick = { viewModel.deleteDuplicates() },
-            enabled = buttonState.value,
-            modifier = Modifier
-                .weight(1f)
-        ) {
-            Text(text = "Delete duplicates")
-        }
-    }
-}
-
-@Composable
-private fun ContactCard(contact: Contact) {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp)
-            .fillMaxWidth()
-            .border(1.dp, Color.Blue, RoundedCornerShape(4.dp))
-            .padding(8.dp)
-    ) {
-        ContactAvatar(contact)
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(
-                text = contact.name,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = contact.phoneNumber,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Prev() {
-    ContactCard(Contact(1, "yan", "89146536625", null))
-}
-
-@Composable
-private fun ContactAvatar(contact: Contact) {
-    if (contact.photo == null) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.Blue),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = contact.name[0].toString().uppercase())
-        }
-    } else {
-        Image(
-            bitmap = contact.photo.asImageBitmap(),
-            contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.Gray),
-            contentScale = ContentScale.Crop
-        )
-    }
-}

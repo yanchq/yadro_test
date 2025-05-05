@@ -23,7 +23,6 @@ class ContactsAppRepositoryImpl @Inject constructor(
             ?: throw (RuntimeException("Ошибка подключения к сервису"))
         return when (result) {
             "success" -> {
-                getContacts()
                 DeleteDuplicatesResult.Success
             }
             "nothing" -> DeleteDuplicatesResult.NothingFound
